@@ -18,39 +18,26 @@
     "electron": "^29.0.0",
     "electron-builder": "^24.13.3"
   },
-
   "build": {
     "appId": "com.taiki.covertool",
     "productName": "多功能封面工具",
-
     "mac": {
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": ["arm64"]
         }
       ],
       "icon": "build/icon.png",
-      "category": "public.app-category.utilities",
-
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "identity": null
+      "category": "public.app-category.utilities"
     },
-
     "directories": {
       "output": "dist",
       "buildResources": "build"
     },
-
     "asarUnpack": [
       "node_modules/ffmpeg-static/**/*"
     ],
-
     "files": [
       "main.js",
       "renderer.js",
@@ -66,7 +53,6 @@
       "fonts/"
     ]
   },
-
   "publish": {
     "provider": "github",
     "owner": "Kirota233",
