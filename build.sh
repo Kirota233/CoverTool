@@ -15,8 +15,6 @@ echo ""
 echo "🔨 开始构建（Mac）..."
 echo ""
 
-# 使用环境变量跳过代码签名（避免"安装包损坏"错误）
-export CSC_IDENTITY_AUTO_DISCOVERY=false
 
 # 执行打包
 npm run build

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -32,6 +32,15 @@ function createWindow () {
   });
   // 首先加载启动界面
   mainWindow.loadFile('launcher.html');
+
+  // 处理外部链接，使其在默认浏览器中打开
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:') || url.startsWith('http:')) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+    return { action: 'allow' };
+  });
 }
 
 app.whenReady().then(createWindow);

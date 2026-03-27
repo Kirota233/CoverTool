@@ -11,7 +11,7 @@ build/icon.png
 .DS_Store
 Thumbs.db
 
-# IDE/Editor files
+# IDE/Editor filesgit commit
 .vscode/
 .idea/
 *.swp
