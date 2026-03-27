@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>批量删除前x帧</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans p-8">
+    <!-- 返回按钮 -->
+    <div class="fixed top-4 left-4 z-50">
+        <button id="backBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            ← 返回菜单
+        </button>
+    </div>
+    
+    <div class="h-screen flex items-center justify-center">
+        <div class="bg-white w-full max-w-2xl p-8 rounded-2xl shadow-xl border border-slate-200">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-rose-600 mb-2">✂️ 视频批量删除前x帧</h1>
+                <p class="text-slate-500 text-sm">选择包含视频的文件夹，自动削去每个视频开头的指定帧数</p>
+            </div>
+            
+            <div class="bg-rose-50 p-3 rounded-lg border border-rose-200 mb-6">
+                <p class="text-xs font-bold text-rose-800">📌 命名规则说明：</p>
+                <ul class="text-xs text-rose-700 space-y-1 mt-2">
+                    <li><strong>输入视频：</strong>支持任意命名的 .mp4 或 .mov 文件（如 video.mp4, 素材.mov）</li>
+                    <li><strong>自动排序：</strong>文件名中若有数字会按智能排序处理（1,2,3...）</li>
+                    <li><strong>输出文件夹：</strong>自动创建 "output_removed_covers" 文件夹</li>
+                    <li><strong>输出名称：</strong>自动添加前缀 "[无封面]_原文件名.mp4"</li>
+                    <li><strong>帧数设置：</strong>输入要删除的帧数，例如输入 1 表示删除第 1 帧</li>
+                </ul>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold mb-2 text-slate-700">1. 选择原视频所在文件夹</label>
+                    <div class="flex gap-2">
+                        <button id="selectFolderBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-lg text-sm transition-colors font-bold whitespace-nowrap">浏览目录</button>
+                        <input type="text" id="videoFolderDisplay" readonly placeholder="未选择文件夹..." class="w-full border p-3 rounded-lg text-sm bg-slate-50 text-slate-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-2 text-slate-700">2. 设置要剪掉的前 N 帧</label>
+                    <div class="flex items-center gap-4 bg-rose-50 p-4 rounded-lg border border-rose-100">
+                        <input type="number" id="framesToRemove" value="1" min="1" class="w-24 border p-2 rounded text-lg font-bold text-center text-rose-600 outline-none">
+                        <span class="text-sm text-rose-800 font-medium">帧 (如果是1帧封面，填 1 即可)</span>
+                    </div>
+                </div>
+                
+                <hr class="border-slate-100 my-6">
+
+                <button id="startBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-rose-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                    一键批量删除前x帧
+                </button>
+                
+                <div id="statusBox" class="hidden mt-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                    <p id="statusText" class="text-sm text-center text-slate-600 font-medium whitespace-pre-line break-all"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./renderer-remove.js"></script>
+    
+    <!-- 作者信息脚注 -->
+    <div class="fixed bottom-4 right-4 text-xs text-slate-400 bg-slate-50 px-3 py-1 rounded border border-slate-200">
+        作者: Taiki
+    </div>
+</body>
+</html>

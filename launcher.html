@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>多功能视频处理工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-btn {
+            transition: all 0.3s ease;
+        }
+        .card-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="text-slate-800 font-sans h-screen flex items-center justify-center p-8">
+    <!-- 顶部菜单栏 -->
+    <div class="fixed top-0 left-0 right-0 bg-gradient-to-b from-black/30 to-transparent p-4 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🎬</span>
+                <span class="text-white font-bold text-lg">CoverTool</span>
+            </div>
+            <button onclick="goToInfo()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/30">
+                ℹ️ 使用教程
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-5xl w-full mt-16">
+        <!-- 标题 -->
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-bold text-white mb-4">🎬 视频处理工具集</h1>
+            <p class="text-lg text-white/80">选择一个功能开始使用</p>
+        </div>
+
+        <!-- 三个功能卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- 功能1: 批量制作封面 -->
+            <div class="card-btn bg-white rounded-3xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-3xl" onclick="goToFeature('cover')">
+                <div class="bg-gradient-to-br from-blue-400 to-blue-600 p-8 text-center">
+                    <div class="text-6xl mb-4">🖼️</div>
+                    <h2 class="text-2xl font-bold text-white">批量制作封面</h2>
+                </div>
+                <div class="p-6 text-center">
+                    <p class="text-slate-600 mb-4">
+                        上传图片，自动添加文字、排版、效果，生成高质量视频封面
+                    </p>
+                    <ul class="text-left text-sm text-slate-500 space-y-2 mb-4">
+                        <li>✓ 自定义文字内容</li>
+                        <li>✓ 灵活的排版控制</li>
+                        <li>✓ 支持自定义字体</li>
+                        <li>✓ 选择输出文件夹</li>
+                    </ul>
+                    <div class="text-blue-600 font-bold text-sm">点击进入 →</div>
+                </div>
+            </div>
+
+            <!-- 功能2: 批量嵌入封面 -->
+            <div class="card-btn bg-white rounded-3xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-3xl" onclick="goToFeature('embed')">
+                <div class="bg-gradient-to-br from-green-400 to-green-600 p-8 text-center">
+                    <div class="text-6xl mb-4">🎥</div>
+                    <h2 class="text-2xl font-bold text-white">批量嵌入封面</h2>
+                </div>
+                <div class="p-6 text-center">
+                    <p class="text-slate-600 mb-4">
+                        将生成的封面图片嵌入到视频第一帧，制作完整的短视频
+                    </p>
+                    <ul class="text-left text-sm text-slate-500 space-y-2 mb-4">
+                        <li>✓ 自动适配分辨率</li>
+                        <li>✓ 选择视频文件夹</li>
+                        <li>✓ 选择封面文件夹</li>
+                        <li>✓ 快速处理多个视频</li>
+                    </ul>
+                    <div class="text-green-600 font-bold text-sm">点击进入 →</div>
+                </div>
+            </div>
+
+            <!-- 功能3: 批量删除前x帧 -->
+            <div class="card-btn bg-white rounded-3xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-3xl" onclick="goToFeature('remove')">
+                <div class="bg-gradient-to-br from-rose-400 to-rose-600 p-8 text-center">
+                    <div class="text-6xl mb-4">✂️</div>
+                    <h2 class="text-2xl font-bold text-white">删除前x帧</h2>
+                </div>
+                <div class="p-6 text-center">
+                    <p class="text-slate-600 mb-4">
+                        批量删除视频开头的指定帧数，快速剔除不需要的片段
+                    </p>
+                    <ul class="text-left text-sm text-slate-500 space-y-2 mb-4">
+                        <li>✓ 灵活设置帧数</li>
+                        <li>✓ 批量处理多个视频</li>
+                        <li>✓ 保留原始音频</li>
+                        <li>✓ 自动输出到output文件夹</li>
+                    </ul>
+                    <div class="text-rose-600 font-bold text-sm">点击进入 →</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部需要帮助提示 -->
+        <div class="text-center mt-12">
+            <p class="text-white/60 text-sm">💡 在每个功能内点击返回按钮可返回此菜单</p>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        function goToFeature(feature) {
+            // 发送消息给主进程去加载对应的页面
+            ipcRenderer.send('load-feature', feature);
+        }
+
+        function goToInfo() {
+            // 加载介绍页面
+            ipcRenderer.send('load-feature', 'info');
+        }
+    </script>
+    
+    <!-- 作者信息脚注 -->
+    <div class="fixed bottom-4 right-4 text-xs text-slate-400 bg-slate-50 px-3 py-1 rounded border border-slate-200">
+        作者: Taiki
+    </div>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoverTool - 使用教程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #0f172a, #1e293b);
+            color: #e2e8f0;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: rgba(30, 41, 59, 0.5);
+            color: #cbd5e1;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .step-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            border-left-color: #764ba2;
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateX(4px);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .tip-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .module-intro {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .feature-item strong {
+            color: #667eea;
+        }
+
+        .module-content {
+            display: none;
+        }
+
+        .module-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-50 backdrop-blur-lg bg-slate-900/50 border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-2xl">🎬</div>
+                <h1 class="text-xl font-bold gradient-text">CoverTool 使用教程</h1>
+            </div>
+            <button onclick="goBack()" class="back-btn px-4 py-2 rounded-lg text-sm font-medium">
+                ← 返回主菜单
+            </button>
+        </div>
+    </nav>
+
+    <!-- 页面内容 -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- 标签栏导航 -->
+        <div class="mb-8 flex gap-4 flex-wrap">
+            <button class="tab-btn active" onclick="switchModule('module1', this)">
+                🖼️ 模块1：批量制作封面
+            </button>
+            <button class="tab-btn" onclick="switchModule('module2', this)">
+                🎥 模块2：批量嵌入封面
+            </button>
+            <button class="tab-btn" onclick="switchModule('module3', this)">
+                ✂️ 模块3：删除前x帧
+            </button>
+        </div>
+
+        <!-- ========== 模块1: 批量制作封面 ========== -->
+        <div id="module1" class="module-content active">
+            <div class="mb-8">
+                <div class="mb-6">
+                    <h2 class="text-4xl font-bold mb-4">
+                        <span class="gradient-text">🖼️ 批量制作封面</span>
+                    </h2>
+                    <p class="text-slate-300 text-lg">这个模块帮助你快速生成高质量的视频封面。你可以上传一张基础图片，然后通过直观的界面添加文字、调整排版，实时预览效果。</p>
+                </div>
+
+                <div class="module-intro">
+                    <p class="text-slate-300">完美适用于：短视频创作、社交媒体内容、视频平台上传等场景。</p>
+                </div>
+            </div>
+
+            <!-- 步骤卡片 -->
+            <div class="space-y-4">
+                <!-- 步骤1 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">上传基础底图</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"选择基础底图"按钮，选择你想要使用的参考图片（支持 .png 和 .jpg 格式）。这张图片将作为封面的基础。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>建议：</strong> 使用与目标分辨率相同的图片尺寸，这样生成的封面效果会更好。常见尺寸有 1920×1080（16:9）或 1080×1080（1:1）。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">添加文字内容</h3>
+                        <p class="text-slate-300 mb-3">
+                            在右侧的文字输入区域，输入你想要显示的内容（如 EP1、EP2 等）。文字会实时显示在预览画布上。
+                        </p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <strong>文字选项：</strong> 直接输入自定义内容
+                            </div>
+                            <div class="feature-item">
+                                <strong>字号调整：</strong> 使用数字输入框改变大小
+                            </div>
+                            <div class="feature-item">
+                                <strong>颜色选择：</strong> 点击颜色框自定义文字颜色
+                            </div>
+                            <div class="feature-item">
+                                <strong>字间距：</strong> 调整字与字之间的距离
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">调整字体和排版</h3>
+                        <p class="text-slate-300 mb-3">
+                            选择合适的字体和字体粗细。系统提供了默认字体，你也可以点击"+ 加载系统字体"加载电脑中的所有字体。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>系统字体加载：</strong> 点击"+ 加载系统字体"按钮后，所有电脑中安装的字体都会出现在下拉菜单中，供你选择使用。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤4 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">实时拖拽调整位置</h3>
+                        <p class="text-slate-300 mb-3">
+                            在右侧的预览区域，你可以直接拖拽文字来调整它的位置。也可以使用左侧的 X、Y 坐标输入框精确控制位置。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>操作技巧：</strong> 鼠标在文字上会显示抓手光标，直接拖动即可。右下角的白色控制点可用于后续的缩放操作。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤5 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">5</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">添加阴影效果（可选）</h3>
+                        <p class="text-slate-300 mb-3">
+                            在"阴影效果"区域，可以为文字添加阴影，增加立体感。调整颜色、模糊度和偏移量以获得最佳效果。
+                        </p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <strong>阴影颜色：</strong> 自定义阴影的颜色
+                            </div>
+                            <div class="feature-item">
+                                <strong>模糊程度：</strong> 控制阴影的模糊度
+                            </div>
+                            <div class="feature-item">
+                                <strong>X/Y 偏移：</strong> 调整阴影位置
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤6 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">6</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">配置输出和生成封面</h3>
+                        <p class="text-slate-300 mb-3">
+                            设置输出文件夹位置、封面名称前缀和总集数，然后点击"开始生成"按钮，工具会自动生成所有编号的封面。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>示例：</strong> 如果设置前缀为"cover"，总集数为5，将生成 cover_EP1.png、cover_EP2.png ... cover_EP5.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 模块2: 批量嵌入封面 ========== -->
+        <div id="module2" class="module-content">
+            <div class="mb-8">
+                <div class="mb-6">
+                    <h2 class="text-4xl font-bold mb-4">
+                        <span class="gradient-text">🎥 批量嵌入封面</span>
+                    </h2>
+                    <p class="text-slate-300 text-lg">这个模块将生成好的封面图片与视频合并，创建完整的短视频。封面会自动成为视频的第一帧，完美适配各种分辨率。</p>
+                </div>
+
+                <div class="module-intro">
+                    <p class="text-slate-300">完美适用于：抖音、快手、B站等短视频平台的内容发布。</p>
+                </div>
+            </div>
+
+            <!-- 步骤卡片 -->
+            <div class="space-y-4">
+                <!-- 步骤1 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">选择视频文件夹</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"选择视频文件夹"按钮，选择存放原始视频文件的文件夹。这些视频将与对应的封面进行合并。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>文件夹结构：</strong> 建议将所有原始视频放在一个文件夹中，比如 videos/ 文件夹。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">选择封面文件夹</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"选择封面文件夹"按钮，选择存放已生成的封面图片的文件夹。这些封面将被嵌入到对应的视频中。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>命名对应：</strong> 确保视频和封面的命名规律一致，系统会根据序号自动匹配。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">配置输出分辨率</h3>
+                        <p class="text-slate-300 mb-3">
+                            选择输出视频的分辨率。系统提供了常用的分辨率预设（如 1080×1920、1920×1080 等），支持自定义分辨率。
+                        </p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <strong>1920×1080：</strong> 大多数视频平台标准
+                            </div>
+                            <div class="feature-item">
+                                <strong>1080×1920：</strong> 竖屏短视频
+                            </div>
+                            <div class="feature-item">
+                                <strong>1080×1080：</strong> 正方形内容
+                            </div>
+                            <div class="feature-item">
+                                <strong>自定义：</strong> 输入任意分辨率
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤4 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">选择输出位置</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"选择输出文件夹"按钮，指定合成后的视频要保存到哪里。系统推荐使用桌面或项目专用文件夹。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>默认位置：</strong> 如果没有选择，输出文件默认保存到视频文件夹的 output 子文件夹中。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤5 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">5</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">开始合成</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"开始合成"按钮，系统会自动处理所有视频和封面的组合。处理过程中会显示进度信息，完成后会提示保存位置。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>处理时间：</strong> 处理时长取决于视频的数量和大小。请耐心等待直到完成提示出现。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 模块3: 删除前x帧 ========== -->
+        <div id="module3" class="module-content">
+            <div class="mb-8">
+                <div class="mb-6">
+                    <h2 class="text-4xl font-bold mb-4">
+                        <span class="gradient-text">✂️ 删除前x帧</span>
+                    </h2>
+                    <p class="text-slate-300 text-lg">这个模块用于批量删除视频开头的指定帧数。当你需要快速移除不需要的片段时，这个工具能大幅提升效率。</p>
+                </div>
+
+                <div class="module-intro">
+                    <p class="text-slate-300">完美适用于：去除视频前期的logo、黑屏、错误开头等不需要的内容。</p>
+                </div>
+            </div>
+
+            <!-- 步骤卡片 -->
+            <div class="space-y-4">
+                <!-- 步骤1 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">选择视频文件夹</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"选择视频文件夹"按钮，选择包含需要处理的视频文件的文件夹。支持 .mp4 和 .mov 格式。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>支持格式：</strong> .mp4（最常见）、.mov（苹果视频格式）等主流视频格式都支持。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">设置要删除的帧数</h3>
+                        <p class="text-slate-300 mb-3">
+                            在"删除前x帧"的输入框中，输入你想要删除的帧数。标准视频帧率为 30fps，输入数字即可。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>计算参考：</strong> 如果视频帧率为 30fps，删除 30 帧相当于删除 1 秒的内容。删除 150 帧就是删除 5 秒。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">选择输出位置</h3>
+                        <p class="text-slate-300 mb-3">
+                            可选择输出文件夹位置。如果不选择，系统默认在原视频文件夹下创建 output_removed_covers 文件夹来保存处理后的视频。
+                        </p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <strong>自动命名：</strong> 输出文件名前会加上"[无封面]_"标记
+                            </div>
+                            <div class="feature-item">
+                                <strong>保留原文件：</strong> 原始视频不会被删除
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤4 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">开始处理</h3>
+                        <p class="text-slate-300 mb-3">
+                            点击"开始删除"按钮，系统会自动处理文件夹中的所有视频文件，删除指定帧数后保存到输出位置。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>处理状态：</strong> 页面会实时显示处理进度，你可以看到当前正在处理的是第几个视频。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤5 -->
+                <div class="step-card rounded-lg p-6 flex gap-6">
+                    <div class="step-number">5</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-3">处理完成</h3>
+                        <p class="text-slate-300 mb-3">
+                            当所有视频处理完成后，系统会提示完成状态，包括成功处理的数量和失败的数量。随后你可以在输出文件夹中找到处理后的视频。
+                        </p>
+                        <div class="tip-box p-3 rounded text-sm">
+                            💡 <strong>质量保证：</strong> 视频在处理过程中会保持原有的分辨率和帧率，确保质量不损失。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结束 -->
+        <section class="text-center py-12 mt-12">
+            <p class="text-slate-400 text-lg mb-6">
+                现在你已经了解了所有功能的使用方法，准备好开始使用了吗？
+            </p>
+            <button onclick="goBack()" class="gradient-btn text-white px-8 py-3 rounded-lg font-bold transition-all hover:shadow-lg">
+                🚀 打开应用开始使用
+            </button>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="border-t border-slate-800 py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
+            <p>CoverTool v2.0.0 | © 2024</p>
+        </div>
+    </footer>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        function goBack() {
+            ipcRenderer.send('load-feature', 'launcher');
+        }
+
+        function switchModule(moduleId, button) {
+            // 隐藏所有模块
+            const modules = document.querySelectorAll('.module-content');
+            modules.forEach(module => {
+                module.classList.remove('active');
+            });
+
+            // 移除所有按钮的active类
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 显示选中的模块
+            document.getElementById(moduleId).classList.add('active');
+            button.classList.add('active');
+        }
+    </script>
+</body>
+</html>

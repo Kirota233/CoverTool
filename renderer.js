@@ -31,16 +31,25 @@ const shadowBlurInput = getEl('shadowBlur');
 const shadowOffsetXInput = getEl('shadowOffsetX');
 const shadowOffsetYInput = getEl('shadowOffsetY');
 
-const selectFolderBtn = getEl('selectFolderBtn');
-const videoFolderDisplay = getEl('videoFolderDisplay');
-const projectNameInput = getEl('projectName');
-const startSynthesisBtn = getEl('startSynthesisBtn');
-const synthesisStatus = getEl('synthesisStatus');
-const videoResolutionInput = getEl('videoResolution'); 
-const synthesisStatusBox = getEl('synthesisStatusBox'); 
+const backBtn = getEl('backBtn');
+const selectOutputFolderBtn = getEl('selectOutputFolderBtn');
+const outputFolderDisplay = getEl('outputFolderDisplay');
+const coverNamePrefix = getEl('coverNamePrefix');
+const loadSystemFontsBtn = getEl('loadSystemFontsBtn');
 
 let baseImage = new Image();
-let selectedVideoFolder = null;
+let selectedOutputFolder = null;
+let outputFolderPath = desktopPath;
+let systemFontsLoaded = false;
+
+// ==========================================
+// 返回菜单
+// ==========================================
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        ipcRenderer.send('load-feature', 'launcher');
+    });
+}
 
 // ==========================================
 // 用于记录文字包围盒的全局变量，方便鼠标检测
@@ -60,13 +69,55 @@ if (customFontInput) {
             document.fonts.add(customFont);
 
             const option = document.createElement('option');
-            option.value = `'${fontName}'`;
+            option.value = fontName;  // 不带引号
             option.text = `自定义: ${file.name}`;
             fontFamilyInput.appendChild(option);
-            fontFamilyInput.value = `'${fontName}'`;
+            fontFamilyInput.value = fontName;
             drawPreview("EP1"); 
         } catch (err) {
             alert("❌ 字体加载失败！请确认上传的是标准的 .ttf 或 .otf 格式字体文件。");
+        }
+    });
+}
+
+// 加载系统字体
+if (loadSystemFontsBtn) {
+    loadSystemFontsBtn.addEventListener('click', async () => {
+        if (systemFontsLoaded) {
+            alert('系统字体已加载！');
+            return;
+        }
+        
+        loadSystemFontsBtn.innerText = '⏳ 正在加载...';
+        loadSystemFontsBtn.style.pointerEvents = 'none';
+        
+        try {
+            const fonts = await ipcRenderer.invoke('get-system-fonts');
+            
+            fonts.forEach(fontName => {
+                const existingOption = Array.from(fontFamilyInput.options).find(
+                    opt => opt.value === fontName
+                );
+                if (!existingOption) {
+                    const option = document.createElement('option');
+                    option.value = fontName;  // 不带引号
+                    option.text = fontName;
+                    fontFamilyInput.appendChild(option);
+                }
+            });
+            
+            loadSystemFontsBtn.innerText = `✅ 已加载 ${fonts.length} 个字体`;
+            systemFontsLoaded = true;
+            
+            setTimeout(() => {
+                loadSystemFontsBtn.innerText = '+ 加载系统字体';
+                loadSystemFontsBtn.style.pointerEvents = 'auto';
+            }, 2000);
+        } catch (err) {
+            console.error('加载系统字体失败:', err);
+            alert('❌ 加载系统字体失败');
+            loadSystemFontsBtn.innerText = '+ 加载系统字体';
+            loadSystemFontsBtn.style.pointerEvents = 'auto';
         }
     });
 }
@@ -121,8 +172,13 @@ function drawPreview(episodeText = "EP1", isExporting = false) {
     const fontSize = fontSizeInput ? parseInt(fontSizeInput.value) : 80;
     const letterSpacing = letterSpacingInput ? parseInt(letterSpacingInput.value) || 0 : 0;
     const fontWeight = fontWeightInput ? fontWeightInput.value : "bold";
-    const fontFamily = fontFamilyInput ? fontFamilyInput.value : "sans-serif";
+    let fontFamily = fontFamilyInput ? fontFamilyInput.value : "sans-serif";
     const fontColor = fontColorInput ? fontColorInput.value : "#ffffff"; 
+    
+    // 如果字体名称中有空格，需要加引号
+    if (fontFamily && fontFamily.includes(' ') && !fontFamily.startsWith("'")) {
+        fontFamily = `'${fontFamily}'`;
+    }
     
     ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.fillStyle = fontColor; 
@@ -308,11 +364,15 @@ if (generateBtn) {
             alert("请先选择一张底图！");
             return;
         }
-        if (!fs.existsSync(desktopPath)) {
-            fs.mkdirSync(desktopPath);
+        
+        const outputPath = selectedOutputFolder || desktopPath;
+        if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, { recursive: true });
         }
 
         const total = totalEpisodesInput ? parseInt(totalEpisodesInput.value) : 1;
+        const prefix = coverNamePrefix && coverNamePrefix.value.trim() ? coverNamePrefix.value.trim() : 'cover';
+        
         if (statusText) {
             statusText.innerText = "正在疯狂生成中...";
             statusText.className = "text-sm text-center mt-3 text-blue-500 font-bold";
@@ -325,14 +385,15 @@ if (generateBtn) {
                 drawPreview(`EP${i}`, true); 
                 const dataURL = canvas.toDataURL('image/png');
                 const base64Data = dataURL.replace(/^data:image\/png;base64,/, "");
-                const outputPath = path.join(desktopPath, `cover_EP${i}.png`);
-                fs.writeFileSync(outputPath, base64Data, 'base64');
+                const fileName = `${prefix}_EP${i}.png`;
+                const filePath = path.join(outputPath, fileName);
+                fs.writeFileSync(filePath, base64Data, 'base64');
             }
 
             // 生成完毕后，把蓝色控制框画回来
             drawPreview("EP1", false);
             if (statusText) {
-                statusText.innerText = `✅ 成功生成 ${total} 张！已存放到桌面：生成封面图_Output`;
+                statusText.innerText = `✅ 成功生成 ${total} 张！已存放到：${outputPath}`;
                 statusText.className = "text-sm text-center mt-3 text-green-600 font-bold";
             }
             generateBtn.disabled = false;
@@ -348,60 +409,13 @@ document.fonts.ready.then(() => {
 // ==========================================
 // 第 2 步：视频合成交互逻辑 
 // ==========================================
-if (selectFolderBtn) {
-    selectFolderBtn.addEventListener('click', async () => {
+if (selectOutputFolderBtn) {
+    selectOutputFolderBtn.addEventListener('click', async () => {
         const folder = await ipcRenderer.invoke('select-folder');
         if (folder) {
-            selectedVideoFolder = folder;
-            videoFolderDisplay.value = folder;
+            selectedOutputFolder = folder;
+            outputFolderPath = folder;
+            outputFolderDisplay.value = folder;
         }
     });
 }
-
-if (startSynthesisBtn) {
-    startSynthesisBtn.addEventListener('click', () => {
-        if (!selectedVideoFolder) {
-            alert('老铁，请先选择原视频所在的文件夹！');
-            return;
-        }
-
-        const total = totalEpisodesInput ? parseInt(totalEpisodesInput.value) : 1;
-        const projectName = projectNameInput ? projectNameInput.value : '我的项目';
-        const resolution = videoResolutionInput ? videoResolutionInput.value : '1080x1920';
-
-        if (synthesisStatusBox) {
-            synthesisStatusBox.classList.remove('hidden');
-            synthesisStatusBox.className = "mt-4 p-3 rounded bg-blue-50 border border-blue-200";
-        }
-        
-        synthesisStatus.innerText = "准备启动 FFmpeg 引擎...";
-        synthesisStatus.className = "text-sm text-center text-blue-600 font-bold break-all";
-        startSynthesisBtn.disabled = true;
-
-        ipcRenderer.send('start-synthesis', {
-            videoFolder: selectedVideoFolder,
-            imageFolder: desktopPath,
-            totalEpisodes: total,
-            projectName: projectName,
-            resolution: resolution
-        });
-    });
-}
-
-ipcRenderer.on('synthesis-progress', (event, msg) => {
-    synthesisStatus.innerText = msg;
-});
-
-ipcRenderer.on('synthesis-complete', (event, msg) => {
-    if(synthesisStatusBox) synthesisStatusBox.className = "mt-4 p-3 rounded bg-green-50 border border-green-200";
-    synthesisStatus.innerText = msg;
-    synthesisStatus.className = "text-sm text-center text-green-600 font-bold";
-    startSynthesisBtn.disabled = false;
-});
-
-ipcRenderer.on('synthesis-error', (event, msg) => {
-    if(synthesisStatusBox) synthesisStatusBox.className = "mt-4 p-3 rounded bg-red-50 border border-red-200 overflow-y-auto max-h-40 text-left";
-    synthesisStatus.innerText = `❌ 发生错误:\n${msg}`;
-    synthesisStatus.className = "text-xs text-red-600 font-mono whitespace-pre-wrap break-all";
-    startSynthesisBtn.disabled = false;
-});

@@ -1,7 +1,7 @@
 {
   "name": "covertool",
-  "version": "1.0.0",
-  "description": "自动化封面与视频合成工具",
+  "version": "2.0.0",
+  "description": "多功能封面与视频处理工具",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -19,18 +19,52 @@
   },
   "build": {
     "appId": "com.taiki.covertool",
-    "productName": "自动化封面合成器",
+    "productName": "多功能封面工具",
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "sign": null,
+      "identity": null
     },
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "build"
     },
     "asarUnpack": [
       "node_modules/ffmpeg-static/**/*"
+    ],
+    "files": [
+      "main.js",
+      "renderer.js",
+      "renderer-embed.js",
+      "renderer-remove.js",
+      "index.html",
+      "embed.html",
+      "remove-frames.html",
+      "launcher.html",
+      "package.json",
+      "node_modules/",
+      "fonts/"
     ]
   }
 }

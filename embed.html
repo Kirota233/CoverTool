@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>批量嵌入封面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans p-8">
+    <!-- 返回按钮 -->
+    <div class="fixed top-4 left-4 z-50">
+        <button id="backBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            ← 返回菜单
+        </button>
+    </div>
+    
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            
+            <h2 class="text-2xl font-bold mb-6 text-green-700">🎥 批量嵌入封面</h2>
+            
+            <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4">
+                <p class="text-xs font-bold text-yellow-800">📌 命名规则说明：</p>
+                <ul class="text-xs text-yellow-700 space-y-1 mt-2">
+                    <li><strong>视频文件：</strong>文件名中必须包含阿拉伯数字（如 video1.mp4, 第2集.mp4, ep_03.mp4）</li>
+                    <li><strong>封面文件：</strong>文件名中必须包含阿拉伯数字（如 cover_1.png, 第一集.jpg, 03.png）</li>
+                    <li><strong>自动排序：</strong>系统会按数字大小自动排序并配对（1,2,3...不是1,10,2）</li>
+                    <li><strong>输出名称：</strong>自动为 "项目名_1.mp4", "项目名_2.mp4" 等</li>
+                </ul>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="flex gap-4 mb-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium mb-1 text-slate-700">项目名 (输出前缀)</label>
+                        <input type="text" id="projectName" value="项目名" class="w-full border p-2 rounded text-sm bg-slate-50">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium mb-1 text-slate-700">输出分辨率 (比例)</label>
+                        <select id="videoResolution" class="w-full border p-2 rounded text-sm bg-slate-50">
+                            <option value="1080x1920">1080×1920 (9:16 高清)</option>
+                            <option value="720x1280">720×1280 (9:16 标清)</option>
+                            <option value="1080x1440">1080×1440 (3:4 小红书)</option>
+                            <option value="1080x1080">1080×1080 (1:1 正方形)</option>
+                            <option value="1920x1080">1920×1080 (16:9 横屏)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-slate-700">1. 选择原视频所在文件夹</label>
+                    <p class="text-xs text-slate-500 mb-2">💡 视频文件名只要包含数字就可以（如 video1.mp4, 第二集.mp4）</p>
+                    <div class="flex gap-2">
+                        <button id="selectFolderBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded text-sm transition-colors whitespace-nowrap font-medium">选择目录</button>
+                        <input type="text" id="videoFolderDisplay" readonly placeholder="请选择文件夹..." class="w-full border p-2 rounded text-sm bg-slate-100 text-slate-500">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-slate-700">2. 选择封面文件夹</label>
+                    <p class="text-xs text-slate-500 mb-2">💡 封面文件名也只要包含数字就可以（如 cover1.png, 第一集.png）</p>
+                    <div class="flex gap-2">
+                        <button id="selectCoverFolderBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded text-sm transition-colors whitespace-nowrap font-medium">选择路径</button>
+                        <input type="text" id="coverFolderDisplay" readonly placeholder="请选择文件夹..." class="w-full border p-2 rounded text-sm bg-slate-100 text-slate-500">
+                    </div>
+                </div>
+
+                <!-- 预览列表区域 -->
+                <div id="previewBox" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-blue-700">📋 处理预览列表</h3>
+                        <span id="previewCount" class="text-xs text-blue-600"></span>
+                    </div>
+                    <div id="previewList" class="space-y-2 max-h-64 overflow-y-auto pr-2 text-sm border border-blue-100 rounded bg-white p-3">
+                        <!-- 动态生成的预览项 -->
+                    </div>
+                    <p class="text-xs text-blue-600 mt-2 italic">💡 使用滚轮可查看全部文件配对情况</p>
+                </div>
+                
+                <button id="startSynthesisBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    开始批量合成视频
+                </button>
+                <div id="synthesisStatusBox" class="hidden mt-4 p-3 rounded bg-slate-100 border border-slate-200">
+                    <p id="synthesisStatus" class="text-sm text-center text-slate-600 font-medium break-all"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="./renderer-embed.js"></script>
+    
+    <!-- 作者信息脚注 -->
+    <div class="fixed bottom-4 right-4 text-xs text-slate-400 bg-slate-50 px-3 py-1 rounded border border-slate-200">
+        作者: Taiki
+    </div>
+</body>
+</html>

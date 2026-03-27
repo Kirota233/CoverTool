@@ -1,8 +1,28 @@
+# Dependencies
 node_modules/
+package-lock.json
+
+# Build outputs
 dist/
-*.dmg
+out/
+build/icon.png
+
+# OS files
 .DS_Store
-node_modules/
-dist/
-*.dmg
-.DS_Store
+Thumbs.db
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Runtime files
+*.log
+.env
+.env.local
+
+# Temp files
+*.tmp
+temp/
