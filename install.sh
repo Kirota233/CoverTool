@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# 变量设置 (你需要修改这里的 DMG_URL 为你真实的 GitHub Release 下载链接)
+# 变量设置 (已修复换行问题)
 APP_NAME="多功能封面工具"
 APP_DIR_NAME="多功能封面工具.app"
-DMG_URL="https://mirror.ghproxy.com/https://github.com/Kirota233/CoverTool/releases/download/v2.0.0/covertool-2.0.0-arm64.dmg"TMP_DIR="/tmp/covertool_install"
+
+# 更换为目前更稳定的 ghfast 加速节点
+DMG_URL="https://ghfast.top/https://github.com/Kirota233/CoverTool/releases/download/v2.0.0/covertool-2.0.0-arm64.dmg"
+
+TMP_DIR="/tmp/covertool_install"
 DMG_PATH="$TMP_DIR/app.dmg"
 
 echo "========================================"
@@ -13,7 +17,7 @@ echo "========================================"
 # 1. 创建临时下载目录
 mkdir -p "$TMP_DIR"
 
-# 2. 下载 DMG 文件 (-L 用于跟随 GitHub 的重定向)
+# 2. 下载 DMG 文件
 echo "⬇️  正在下载安装包，请稍候..."
 curl -L "$DMG_URL" -o "$DMG_PATH"
 
@@ -24,7 +28,6 @@ fi
 
 # 3. 挂载 DMG
 echo "💿 正在读取安装包..."
-# 挂载并提取挂载点的路径
 MOUNT_DIR=$(hdiutil attach "$DMG_PATH" -nobrowse -readonly | grep /Volumes/ | awk -F'\t' '{print $3}')
 
 if [ -z "$MOUNT_DIR" ]; then
@@ -34,7 +37,6 @@ fi
 
 # 4. 复制到应用程序文件夹
 echo "📂 正在安装到 应用程序(Applications) 文件夹..."
-# 如果旧版本存在，先删除
 rm -rf "/Applications/$APP_DIR_NAME"
 cp -R "$MOUNT_DIR/$APP_DIR_NAME" "/Applications/"
 
