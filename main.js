@@ -3,7 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const ffmpeg = require('fluent-ffmpeg');
+const { autoUpdater } = require('electron-updater');
 let ffmpegPath = require('ffmpeg-static');
+
+// ==========================================
+// 自动更新配置
+// ==========================================
+autoUpdater.checkForUpdatesAndNotify();
 
 // 【关键修复】：如果是打包后的正式环境，要把路径指向解压后的外部文件夹
 if (app.isPackaged) {
